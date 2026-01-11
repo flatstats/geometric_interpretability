@@ -11,7 +11,7 @@ autoregressive transformer models. Includes:
 - Targeted head verification (punctuation/previous-token/semantic).
 - A deeper "interview" of a specific head to inspect its attention targets.
 
-  ## Contents
+## Contents
 
 - `differential_activation.py`: Core analysis class and visualization helpers.
 - `demo.py`: End-to-end demo that generates samples and runs the analysis.
@@ -39,7 +39,6 @@ downstream logit steering.
 - `delta_manifold.py`: core implementation
 - `delta_cross_session_summary.png`: example visualization
 - `delta-trial*_delta_timeline.png`: example timelines
-- 
 # Cluster Analysis
 
 A tool for clustering cross-session identity markers and labeling the resulting
