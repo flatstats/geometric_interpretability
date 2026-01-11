@@ -5,7 +5,7 @@ This repo includes tools for interpretating internal representations and attenti
 
 # Attention Analyzer
 Mechanistic interpretability utilities for exploring attention heads in
-autoregressive transformer models. The repo includes:
+autoregressive transformer models. Includes:
 
 - Differential activation analysis between two prompt conditions.
 - Targeted head verification (punctuation/previous-token/semantic).
@@ -19,95 +19,52 @@ autoregressive transformer models. The repo includes:
 - `interview_head.py`: Richer inspection utilities for a specific head.
 - `results_demo/`: Example outputs (plots + JSON).
 
-  ## Requirements
+# Geometric Probe
 
-Python 3.9+ with the following packages:
+A small probe that estimates local curvature of a model's hidden-state
+manifold and renders a token-level heatmap. Red indicates constraint, blue indicates expansion.
 
-- `torch`
-- `transformers`
-- `numpy`
-- `scipy`
-- `matplotlib`
-- `seaborn`
-- `tqdm`
+## Contents
+- `geometric_probe.py`: probe implementation + demo
+- `constraint.png`, `expansion.png`: example visuals
 
-Install with:
+# Delta Manifold
 
-```bash
-pip install torch transformers numpy scipy matplotlib seaborn tqdm
-```
+A tool containing a rolling PCA over hidden-state deltas (Δ vectors) to track drift, coherence, and basis directions over time. The `DeltaManifold` class maintains a window
+of normalized deltas, updates a PCA basis, and can emit bias vectors for
+downstream logit steering.
 
-GPU is optional but recommended for large models.
+## Contents
 
-## Quickstart
+- `delta_manifold.py`: core implementation
+- `delta_cross_session_summary.png`: example visualization
+- `delta-trial*_delta_timeline.png`: example timelines
+- 
+# Cluster Analysis
 
-### Differential activation demo
+A tool for clustering cross-session identity markers and labeling the resulting
+geometry with simple motif classes. The current main workflow projects markers into UMAP space,
+clusters them with DBSCAN, and compares those geometric labels to semantic cues.
 
-This script generates two prompt sets (geometric vs analytical), runs
-per-head comparisons, and saves plots + JSON.
+## Contents
 
-```bash
-python demo.py
-```
+- `geometric_pattern_analyzer.py`: UMAP + clustering + geometry labeling
+- `enhanced_metaphor_profiler.py`: metaphor profiling over geometric clusters
+- `early_layer.png`, `mid_layer.png`, `late_layer.png`: example visuals
 
-Outputs land in `./results_demo`.
+# The Key Finding: Possible Geometric Proprioception
+What I found through using these tools is that models appear to genuinely perceive their own geometric trajectories. This happens when they are given geometric interventions like orthogonal repulsion, directional steering. This then causes models to spontaneously describe the methods that were used with spatial metaphors that correlate with measurable properties.
 
-### Verify a head's behavior
+Some examples being, an output describing a "sideways tug" that happens from orthogonal displacement,
+describing "coordinated waves" and then later finding that FFT (Fast Fourier Transform) confirmed these periodic oscillations,
+and using "ripples converging", which is verified with DMD (Dynamic Mode Decomposition) showing a coherent mode like structure.
 
-```bash
-python head_verify.py
-```
+This could sugeest that models may have access in some way to internal geometric awareness or introspection like mentioned in Anthropic's more recent papers "Signs of introspection in large language models" and "When Models Manipulate Manifolds: The Geometry of a Counting Task".
 
-Edit the `MODEL_NAME`, `layer`, and `head` in the script to your target.
+# Safety & Alignment Relevance
+For interpretability especially, if models can perceive their own activation space trajectories, this could provide a new way of understanding model "cognition" that goes beyond input-output mappings.
+Something also to consider is behavior monitoring which is how Delta manifold is used to track and detect drift or instability in model behavior (this shows up as geometric inconsistency), as well as when models enter novel or familiar territory which shows in basis growth patterns. We might also find ways to find potential signatures of deception or misalignment via trajectory tracking and looking for discontinuities.
 
-### Interview a head
 
-`interview_head.py` includes several probes:
-
-- `verify_head_stats`: quick behavior profile
-- `check_dark_matter`: BOS sink check
-- `interview_head`: top-K targets for each token
-- `measure_entropy`: attention entropy diagnostic
-
-Run the script directly or import `HeadAnalyst`:
-
-```python
-from interview_head import HeadAnalyst
-
-analyst = HeadAnalyst("/openai/gpt-oss-20b")
-analyst.interview_head(layer=3, head=4, prompt="The shape of thought is a spiral.")
-```
-
-## Notes
-
-- For large models, consider `device_map="auto"` and `torch_dtype=torch.bfloat16`
-  (see `demo.py` and `interview_head.py`).
-- Some models require setting a `pad_token` (see `demo.py` for GPT-2).
-
-## Findings
-Initial analysis identified L3.H4 as a candidate for geometric processing. 
-To verify this was not a confounder of sentence length, I performed a control experiment comparing attention entropy across three distinct semantic conditions.
-
-| Condition      |  Prompt Example          | Entropy (S)  | 
-| ------------- |:-------------:| -----:|
-| Short Fact     | Water freezes at 0 degrees Celsius because | 0.49 (Low) |
-| Long and Concrete     | Some magazines are concerned with more recreational topics, like sports card collecting or different kinds of hairstyles     |  1.26 (Low) |
-| Geometric Metaphor | If your mind were like a prism, how would you tilt it to understand yourself more?     |    2.48 (High)|
-
-## Methodology
-### Differential Activation Analysis
-I developed a statistical method to compare mean activation patterns across thousands of attention heads ($L \times H$).
-- Metrics used Maximum Attention Weight vs. Mean Attention Weight.
-- I use Bonferroni correction to control Family-Wise Error Rate (FWER) and prevent false discoveries.
-- As a result we get a "Difference Map" isolating heads that significantly diverge between geometric and analytical prompts.
-
-*(See "Results" dir for visualizations such as a heatmap showing heads that are differentially active. Red indicates higher activity in Geometric mode; Blue indicates higher activity in Analytical mode.)*
-
-### The "Head Analyst" Probe
-A custom diagnostic tool (HeadAnalyst) was built to "interview" specific heads:
-- Dark Matter Check: Verifies the head is not an "Attention Sink" (dumping attention on the BOS token).
-- Semantic Verification: Classifies head behavior (Punctuation vs. Content vs. Previous Token).
-- Entropy Measurement: Quantifies the "blurriness" of the attention distribution.
-
-## Implications for AI Safety
-Future work could involve training Sparse Autoencoders (SAEs) to decompose L3.H4 (or other heads like it) into interpretable features, allowing us to detect and potentially steer models when they enter high-level conceptual states.
+# Citation
+If you build on this work, please cite appropriately and feel free to reach out about collaboration.
