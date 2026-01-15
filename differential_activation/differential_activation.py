@@ -241,7 +241,7 @@ class DifferentialActivationAnalyzer:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         save_path = os.path.join(save_dir, f'diff_activation_{timestamp}.png')
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"📊 Visualization saved to: {save_path}")
+        print(f" Visualization saved to: {save_path}")
         plt.close()
 
     def save_results(self, results: Dict, save_dir: str):
@@ -250,7 +250,7 @@ class DifferentialActivationAnalyzer:
         path = os.path.join(save_dir, f'analysis_data_{timestamp}.json')
         with open(path, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"💾 Raw data saved to: {path}")
+        print(f" Raw data saved to: {path}")
 
 # Example Integration
 
@@ -283,6 +283,4 @@ def run_research_demo(
         print(f"L{head['layer']} H{head['head']:02d} | Diff: {head['difference']:+.4f} | p={head['p_value']:.2e}")
 
 if __name__ == "__main__":
-    # Placeholder for direct execution
-    print("This module provides the DifferentialActivationAnalyzer class.")
-    print("Import it into your experiment script to use.")
+
